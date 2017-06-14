@@ -1,0 +1,89 @@
+{% extends 'catalog/base.html'%}
+{% block title %}{{ selected}}: {{ category }}{% endblock %}
+
+
+{% block body %}
+<div class="container">
+    <div class="page-header">
+        <h1>{{selected}} | {{category}}</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            <h3>Categories</h3>
+            <hr>
+            <div class="list-group">
+                {% for cat in cata %}
+                    <a href="{% url 'catalog:products_list' selection=selected.sex_selection category=cat.name %}" class="list-group-item">
+                        {{ cat.name }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-10">
+            <ul class=" pull-right dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Sort By<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{% url 'catalog:products_list_with_sort' selection=selected.sex_selection category=category order='name' order_type='asc' %}">
+                            Name: A to Z
+                        </a></li>
+                        <li><a href="{% url 'catalog:products_list_with_sort'  selection=selected.sex_selection category=category  order='name' order_type='desc' %}">
+                            Name: Z to A
+                        </a></li>
+                        <li><a href="{% url 'catalog:products_list_with_sort' selection=selected.sex_selection category=category  order='price' order_type='asc' %}">
+                            Price: Low to High
+                        </a></li>
+                        <li><a href="{% url 'catalog:products_list_with_sort'  selection=selected.sex_selection category=category  order='price' order_type='desc' %}">
+                            Price: High to Low
+                        </a></li>
+                        <li><a href="{% url 'catalog:products_list_with_sort'  selection=selected.sex_selection category=category  order='rating' order_type='desc' %}">
+                            Rating
+                        </a></li>
+                    </ul>
+            </ul>
+            <hr>
+            {% for product in products %}
+                <div class="col-md-4">
+                    <div class="thumbnail">
+                        <a href="{% url 'catalog:prod' p_id=product.id %}"><img src={{product.thumbnail_image}}></a>
+                        <div class="caption">
+                            <a href="{% url 'catalog:prod' p_id=product.id %}"><h3 style="text-align: center;">{{ product.name }}</h3></a>
+                            {% if product.sale_price > 0 and product.sale_price < product.price %}
+                            <p class="sale" style="text-align: center;"><span style="color:#333"><strike>$ {{ product.price }}</strike></span> $ {{ product.sale_price }}</p>
+                            <p style="text-align: center;">rating: {{ product.rating }}</p>
+                            {% else %}
+                            <p style="text-align: center;">$ {{ product.price }}</p>
+                            <p style="text-align: center;">rating: {{ product.rating }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <nav aria-label="Page navigation" style="margin-left:200px;">
+        {% if products.has_other_pages %}
+            <ul class="pagination">
+                {% if products.has_previous %}
+                    <li><a href="?page={{ products.previous_page_number }}">&laquo;</a></li>
+                {% else %}
+                    <li class="disabled"><span>&laquo;</span></li>
+                {% endif %}
+                {% for i in page_range%}
+                    {% if products.number == i %}
+                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                    {% else %}
+                    <li><a href="?page={{ i }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if products.has_next %}
+                    <li><a href="?page={{ products.next_page_number }}">&raquo;</a></li>
+                {% else %}
+                    <li class="disabled"><span>&raquo;</span></li>
+                {% endif %}
+            </ul>
+        {% endif %}
+    </nav>
+</div>
+
+
+{% endblock %}
